@@ -8,6 +8,7 @@ The example fits a plane ``z = a*x + b*y + c`` and prints the slopes and
 coefficient of determination (R^2).
 Run it with:
 
+
 ```bash
 python3 linear_regression_example.py
 ```
