@@ -9,6 +9,8 @@ purposes.
 from typing import List, Tuple
 import csv
 import os
+from typing import List, Tuple
+
 
 
 def mean(values: List[float]) -> float:
@@ -38,6 +40,7 @@ def load_csv(path: str) -> Tuple[List[float], List[float], List[float]]:
             zs.append(parse_number(c))
 
     return xs, ys, zs
+
 
 def multiple_linear_regression(
     xs: List[float], ys: List[float], zs: List[float]
@@ -131,6 +134,12 @@ def main() -> None:
     csv_path = os.path.join(os.path.dirname(__file__), "fund_data.csv")
     xs, ys, zs = load_csv(csv_path)
 
+    """Demonstrate multiple linear regression with a tiny dataset."""
+
+    xs = [1, 2, 3, 4, 5]
+    ys = [2, 1, 3, 5, 4]
+    zs = [6, 5, 10, 15, 14]
+
     slope_x, slope_y, intercept = multiple_linear_regression(xs, ys, zs)
     r2 = r_squared(xs, ys, zs, slope_x, slope_y, intercept)
 
@@ -142,6 +151,46 @@ def main() -> None:
     for x, y in zip(xs[:5], ys[:5]):
         pred = predict(x, y, slope_x, slope_y, intercept)
         print(f"Prediction for (1 Ay={x:.2f}, 3 Ay={y:.2f}): {pred:.2f}")
+        
+    print(f"Slope for x: {slope_x:.3f}")
+    print(f"Slope for y: {slope_y:.3f}")
+    print(f"Intercept: {intercept:.3f}")
+    print(f"R^2: {r2:.3f}")
+
+    for x, y in zip(xs, ys):
+        pred = predict(x, y, slope_x, slope_y, intercept)
+        print(f"Prediction for ({x}, {y}): {pred:.3f}")
+        
+"""Simple linear regression example in pure Python"""
+
+from typing import List, Tuple
+
+def mean(values: List[float]) -> float:
+    return sum(values) / len(values)
+
+def linear_regression(xs: List[float], ys: List[float]) -> Tuple[float, float]:
+    if len(xs) != len(ys):
+        raise ValueError("Input lists must have the same length")
+    x_mean = mean(xs)
+    y_mean = mean(ys)
+    numerator = sum((x - x_mean) * (y - y_mean) for x, y in zip(xs, ys))
+    denominator = sum((x - x_mean) ** 2 for x in xs)
+    slope = numerator / denominator
+    intercept = y_mean - slope * x_mean
+    return slope, intercept
+
+def predict(x: float, slope: float, intercept: float) -> float:
+    return slope * x + intercept
+
+def main() -> None:
+    xs = [1, 2, 3, 4, 5]
+    ys = [2, 4, 5, 4, 5]
+    slope, intercept = linear_regression(xs, ys)
+    print(f"Slope: {slope:.3f}")
+    print(f"Intercept: {intercept:.3f}")
+    for x in xs:
+        print(f"Prediction for {x}: {predict(x, slope, intercept):.3f}")
+
 
 if __name__ == "__main__":
     main()
