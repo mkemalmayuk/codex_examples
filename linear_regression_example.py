@@ -1,9 +1,46 @@
+"""Simple multiple linear regression example in pure Python.
+
+This module implements a tiny linear regression routine without using any
+external dependencies. It fits a plane to points (x, y, z) so that ``z`` can
+be predicted from ``x`` and ``y``. It is meant purely for educational
+purposes.
+"""
+
 from typing import List, Tuple
+import csv
+import os
+from typing import List, Tuple
+
 
 
 def mean(values: List[float]) -> float:
     """Return the arithmetic mean of a sequence of numbers."""
     return sum(values) / len(values)
+
+
+def parse_number(value: str) -> float:
+    """Return ``value`` converted from Turkish locale formatting to float."""
+    return float(value.replace(".", "").replace(",", "."))
+
+
+def load_csv(path: str) -> Tuple[List[float], List[float], List[float]]:
+    """Return lists of 1 month, 3 month and 6 month returns from ``path``."""
+    xs: List[float] = []
+    ys: List[float] = []
+    zs: List[float] = []
+
+    with open(path, encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            a, b, c = row["1 Ay (%)"], row["3 Ay (%)"], row["6 Ay (%)"]
+            if "-" in (a, b, c):
+                continue
+            xs.append(parse_number(a))
+            ys.append(parse_number(b))
+            zs.append(parse_number(c))
+
+    return xs, ys, zs
+
 
 def multiple_linear_regression(
     xs: List[float], ys: List[float], zs: List[float]
@@ -92,6 +129,11 @@ def r_squared(
     return 1 - ss_res / ss_tot
 
 def main() -> None:
+    """Demonstrate multiple linear regression using data from ``fund_data.csv``."""
+
+    csv_path = os.path.join(os.path.dirname(__file__), "fund_data.csv")
+    xs, ys, zs = load_csv(csv_path)
+
     """Demonstrate multiple linear regression with a tiny dataset."""
 
     xs = [1, 2, 3, 4, 5]
@@ -101,6 +143,15 @@ def main() -> None:
     slope_x, slope_y, intercept = multiple_linear_regression(xs, ys, zs)
     r2 = r_squared(xs, ys, zs, slope_x, slope_y, intercept)
 
+    print(f"Slope for 1 Ay: {slope_x:.3f}")
+    print(f"Slope for 3 Ay: {slope_y:.3f}")
+    print(f"Intercept: {intercept:.3f}")
+    print(f"R^2: {r2:.3f}")
+
+    for x, y in zip(xs[:5], ys[:5]):
+        pred = predict(x, y, slope_x, slope_y, intercept)
+        print(f"Prediction for (1 Ay={x:.2f}, 3 Ay={y:.2f}): {pred:.2f}")
+        
     print(f"Slope for x: {slope_x:.3f}")
     print(f"Slope for y: {slope_y:.3f}")
     print(f"Intercept: {intercept:.3f}")
