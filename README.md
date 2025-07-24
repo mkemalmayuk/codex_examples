@@ -20,7 +20,6 @@ The repository also includes `print_csv.py` which simply prints the raw CSV data
 python3 print_csv.py
 ```
 
-=======
 coefficient of determination (R^2).
 Run it with:
 
